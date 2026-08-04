@@ -129,7 +129,7 @@ class Player:
                f"Armour: {self.armour_name}, {self.armour_red}% reduction to damage\n"
                f"Available skill points: {self.skill_p}\n"
                f"Inventory: {", ".join(str(Item) for Item in self.inventory)}\n"
-               f"Party: {",".join(self.party)}")
+               f"Party: {", ".join(self.party)}")
     
 class Item:
     def __init__(self, name, damage, hp_restore, value):
@@ -234,6 +234,7 @@ def debug():
               "print: Prints information about: town, player\n"
               "give dev weapon: Gives an overpowered weapon\n"
               "give dev consumable: Gives an overpowered consumable\n"
+              "add party: Adds a dummy to the party"
               "\n"
               "To exit debug mode, type n\n")
         debug_choice = input("Debug choice: ")
@@ -273,6 +274,8 @@ def debug():
         elif debug_choice == "give dev consumable":
             dev_consumable = Item("dev consumable", 0, 500, 500)
             player.inventory.append(dev_consumable)
+        elif debug_choice == "add party":
+            player.party.append("Dummy")
         else:
             if debugging == "n" or debug_choice == "n":
                 print("Exiting debug mode")
