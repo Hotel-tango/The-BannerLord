@@ -5,19 +5,6 @@ import json as j
 # Text adventure loosely based off of Mount and Blade II: Bannerlord
 # Try it, very good game
 
-print("Welcome to")
-print("""
-  ________            ____                              __                   __
- /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
-  / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
- / / / / / /  __/  / /_/ / /_/ / / / / / / /  __/ /  / /___/ /_/ / /  / /_/ /  
-/_/ /_/ /_/\___/  /_____/\__,_/_/ /_/_/ /_/\___/_/  /_____/\____/_/   \__,_/   
-""")
-print("""
-      
-
-""")
-
 def error(code="N/A", function="N/A", fatal=False, message="N/A", unusual=False):
     print("")
     print("")
@@ -130,6 +117,67 @@ class Player:
                f"Available skill points: {self.skill_p}\n"
                f"Inventory: {", ".join(str(Item) for Item in self.inventory)}\n"
                f"Party: {", ".join(self.party)}")
+
+class Soldier:
+    def __init__(self, name, tier, hp, damage, armour, armour_red, mount):
+        self.name = name
+        self.tier = tier
+        self.hp = hp
+        self.damage = damage
+        self.armour = armour
+        self.armour_red = armour_red
+        self.mount = mount
+
+    def __str__(self):
+        print(f"""
+        {self.name}
+        {self.tier}
+        {self.hp}
+        {self.damage}
+        {self.armour}
+        {self.armour_red}
+        {self.mount}
+        """)
+
+    def get_stats(self):
+        if self.tier == 1:
+            self.hp = 75
+            self.damage = 10
+            self.armour = "Rags"
+            self.armour_red = 0
+            self.mount = "N/A"
+        elif self.tier == 2:
+            self.hp = 100
+            self.damage = 25
+            self.armour = "Gambeson"
+            self.armour_red = 15
+            self.mount = "N/A"
+        elif self.tier == 3:
+            self.hp = 125
+            self.damage = 40
+            self.armour = "Chainmail"
+            self.armour_red = 30
+            self.mount = "N/A"
+        elif self.tier == 4:
+            self.hp = 125
+            self.damage = 45
+            self.armour = "Lamellar"
+            self.armour_red = 65
+            self.mount = "N/A"
+        elif self.tier == 5:
+            self.hp = 125
+            self.damage = 50
+            self.armour = "Plate"
+            self.armour_red = 80
+            self.mount = "N/A"
+        elif self.tier == 6:
+            self.hp = 150
+            self.damage = 75
+            self.armour = "Plate"
+            self.armour_red = 80
+            self.mount = "Horse"
+        else:
+            error(fatal=True, message="Code 2, troop tier isn't in accepted range")
     
 class Item:
     def __init__(self, name, damage, hp_restore, value):
@@ -216,12 +264,16 @@ class Town:
             case _:
                 error(fatal=True, message="Code 1")
 
-
+    def recruit(self, recruitment_amount):
+        print(f"Available recruits: {self.available_recruits}")
+        self.recruitment_amount = input("How many recruits would you like to recruit?")
+        for self.recruitment_amount in range:
+            player.party.append("Recruit")
+    
 
 def debug():
-    player = Player(str(input("What is your name?: ")))
     debugging = input("Enter debug mode: ")
-    town = Town("John's town", True, True, True, True, True, "John Doe", "Kingdom of John", 10)
+    debug_town = Town("John's town", True, True, True, True, True, "John Doe", "Kingdom of John", 10)
     while debugging == "y":
         print("")
         print(f"Debug commands: \n"
@@ -235,6 +287,7 @@ def debug():
               "give dev weapon: Gives an overpowered weapon\n"
               "give dev consumable: Gives an overpowered consumable\n"
               "add party: Adds a dummy to the party"
+              "armours: Prints all armours and their stats"
               "\n"
               "To exit debug mode, type n\n")
         debug_choice = input("Debug choice: ")
@@ -246,7 +299,7 @@ def debug():
             player.skill_point_question()
             print(player.strength)
             print(player.max_hp)
-        if debug_choice == "2":
+        elif debug_choice == "2":
                     print("")
                     obj = Item("dev object", 5, 5, 5)
                     player.inventory.append(obj)
@@ -260,14 +313,39 @@ def debug():
             error(unusual=True, message="Debug unusual error")
         elif debug_choice == "6":
             print("")
-            print(town)
-            town.options()
+            print(debug_town)
+            debug_town.options()
         elif debug_choice == "print":
             print(player)
             print("")
             print("Was (player) now (town)")
             print("")
-            print(town)
+            print(debug_town)
+            print("")
+            print("Was (town) now (recruit)")
+            print("")
+            print(recruit)
+            print("")
+            print("Was (recruit) now (militia)")
+            print("")
+            print(militia)
+            print("")
+            print("Was (militia) now (warrior)")
+            print("")
+            print(warrior)
+            print("")
+            print("Was (warrior) now (veteran)")
+            print("")
+            print(veteran)
+            print("")
+            print("Was (veteran) now (man_at_arms)")
+            print("")
+            print(man_at_arms)
+            print("")
+            print("Was (man_at_arms) now (knight)")
+            print("")
+            print(knight)
+            
         elif debug_choice == "give dev weapon":
             dev_weapon = Item("dev weapon", 500, 0, 5000)
             player.inventory.append(dev_weapon)
@@ -276,6 +354,14 @@ def debug():
             player.inventory.append(dev_consumable)
         elif debug_choice == "add party":
             player.party.append("Dummy")
+        elif debug_choice == "armour":
+            print("""
+            Rags: 0
+            Gambeson: 15
+            Chainmail: 30
+            Lamellar: 65
+            Plate: 80
+            """)
         else:
             if debugging == "n" or debug_choice == "n":
                 print("Exiting debug mode")
@@ -298,5 +384,36 @@ def debug():
 
                 """)
                 break
+
+print("Welcome to")
+print("""
+  ________            ____                              __                   __
+ /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
+  / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
+ / / / / / /  __/  / /_/ / /_/ / / / / / / /  __/ /  / /___/ /_/ / /  / /_/ /  
+/_/ /_/ /_/\___/  /_____/\__,_/_/ /_/_/ /_/\___/_/  /_____/\____/_/   \__,_/   
+""")
+print("""
+      
+
+""")
+
+# Initializing classes
+player = Player(str(input("What is your name?: ")))
+
+recruit = Soldier("Recruit", 1)
+militia = Soldier("Militia", 2)
+warrior = Soldier("Warrior", 3)
+veteran = Soldier("Veteran", 4)
+man_at_arms = Soldier("Man-at-Arms", 5)
+knight = Soldier("Knight", 6)
+
+recruit.get_stats()
+militia.get_stats()
+warrior.get_stats()
+veteran.get_stats()
+man_at_arms.get_stats()
+knight.get_stats()
+
 
 debug()
