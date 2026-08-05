@@ -119,14 +119,10 @@ class Player:
                f"Party: {", ".join(self.party)}")
 
 class Soldier:
-    def __init__(self, name, tier, hp, damage, armour, armour_red, mount):
+    def __init__(self, name, tier):
         self.name = name
         self.tier = tier
-        self.hp = hp
-        self.damage = damage
-        self.armour = armour
-        self.armour_red = armour_red
-        self.mount = mount
+        self.get_stats()
 
     def __str__(self):
         print(f"""
@@ -281,13 +277,13 @@ def debug():
               "2: Inventory test\n"
               "3: Error test\n"
               "4: Crash error test\n"
-              "5: Unusual error test"
+              "5: Unusual error test\n"
               "6: Town test\n"
               "print: Prints information about: town, player\n"
               "give dev weapon: Gives an overpowered weapon\n"
               "give dev consumable: Gives an overpowered consumable\n"
-              "add party: Adds a dummy to the party"
-              "armours: Prints all armours and their stats"
+              "add party: Adds a dummy to the party\n"
+              "armours: Prints all armours and their stats\n"
               "\n"
               "To exit debug mode, type n\n")
         debug_choice = input("Debug choice: ")
@@ -408,12 +404,12 @@ veteran = Soldier("Veteran", 4)
 man_at_arms = Soldier("Man-at-Arms", 5)
 knight = Soldier("Knight", 6)
 
-recruit.get_stats()
-militia.get_stats()
-warrior.get_stats()
-veteran.get_stats()
-man_at_arms.get_stats()
-knight.get_stats()
+# recruit.get_stats()
+# militia.get_stats()
+# warrior.get_stats()
+# veteran.get_stats()
+# man_at_arms.get_stats()
+# knight.get_stats()
 
 
 debug()
