@@ -1,6 +1,7 @@
 import random as r
 import time as t
 import json as j
+import warnings as w
 
 # Text adventure loosely based off of Mount and Blade II: Bannerlord
 # Try it, very good game
@@ -17,8 +18,9 @@ def error(code="N/A", function="N/A", fatal=False, message="N/A", unusual=False)
         raise RuntimeError(message)
     
     if unusual:
-        raise RuntimeWarning(message)
-    
+        #raise RuntimeWarning(message)
+        w.warn(message)
+
     print("")
     print("")
     # 0: Debug return for testing
@@ -32,7 +34,7 @@ class Player:
         self.max_hp = 50
         self.hp = 50
         self.level = 0
-        self.strength = 0
+        self.tactics_skill = 0
         self.armour_name = "Rags"
         self.armour_red = 0
         self.money = 0
@@ -58,16 +60,16 @@ class Player:
     def skill_point_question(self):
         if self.skill_p > 0:
             print("Which skills would you like to increase:\n"
-                  "1. Strength: +0.1 damage multiplier\n"
+                  "1. tactics_skill: +0.1 battle win multiplier\n"
                   "2. Max hp: +5 to max hp")
             while True:
                 choice = input("> ").lower()
                 match choice:
-                    case "strength":
+                    case "tactics_skill":
                         self.upgrade_skill(choice)
                         break
                     case "1":
-                        self.upgrade_skill("strength")
+                        self.upgrade_skill("tactics_skill")
                         break
                     case "max hp":
                         self.upgrade_skill(choice)
@@ -87,8 +89,8 @@ class Player:
 
     def upgrade_skill(self, skill):
         match skill:
-            case "strength":
-                self.strength += 0.1
+            case "tactics_skill":
+                self.tactics_skill += 0.1
             case "max hp":
                 self.max_hp += 5
                 self.hp += 5
@@ -99,18 +101,19 @@ class Player:
         final_damage = round(damage * (1 - self.armour_red / 100))
         damage_blocked = damage - final_damage
         self.hp -= final_damage
+
+        if damage < 0:
+            error(unusual=True, message="Code 2, negative damage passed to take_damage")
+
         if self.hp < 1:
             print(f"You died by the hands of {attacker}.")
         else:
             print(f"{attacker} did {final_damage} against you, your armour blocked {damage_blocked}. Your hp is now {self.hp}.")
 
-        if damage < 0:
-            error(unusual=True, message="Code 2, negative damage passed to take_damage")
-
     def __str__(self):
         return(f"{self.name}'s statistics:\n"
                f"Level: {self.level}\n"
-               f"Strength: {self.strength}\n"
+               f"tactics_skill: {self.tactics_skill}\n"
                f"Max HP: {self.max_hp}\n"
                f"Current HP: {self.hp}\n"
                f"Armour: {self.armour_name}, {self.armour_red}% reduction to damage\n"
@@ -174,16 +177,34 @@ class Soldier:
             self.mount = "Horse"
         else:
             error(fatal=True, message="Code 2, troop tier isn't in accepted range")
-    
+
+class Enemy:
+
+    def __init__(self, tier, tactic_skill):
+        pass
+
+    def __str__(self):
+        pass
+
 class Item:
     def __init__(self, name, damage, hp_restore, value):
         self.name = name
         self.damage = damage
         self.hp_restore = hp_restore
         self.value = value
-    
+        self.check_values()
+
     def __str__(self):
-        return self.name
+        return self.name    
+
+    def check_values(self):
+        if self.damage < 0:
+            error(unusual=True, message="Code 2, self.damage is negative, should be 0 or more")
+        if self.hp_restore < 0:
+            error(unusual=True, message="Code 2, self.hp_restore is negative, should be 0 or more")
+        if self.value < 0:
+            # Why tho? Why the hell do you need to pay someone to take something from you? It's legit the other way around.
+            print("bruh")
 
 class Town:
 
@@ -250,10 +271,11 @@ class Town:
                 self.store("Armour shop", r.randint(2, 6))
             case "Weapon shop":
                 self.store("Weapon shop", r.randint(2, 6))
-            case "miscellaneous shop":
-                self.store("miscellaneous shop", r.randint(4, 9))
+            case "Miscellaneous shop":
+                self.store("Miscellaneous shop", r.randint(4, 9))
             case "Tavern":
                 # The tavern is gonna be a place to recruit companions, or get jobs. Dunno yet, so we'll pass
+                print("WIP")
                 pass
             case "Mount shop":
                 self.store("Mount shop", r.randint(1, 5))
@@ -262,7 +284,7 @@ class Town:
 
     def recruit(self, recruitment_amount):
         print(f"Available recruits: {self.available_recruits}")
-        self.recruitment_amount = input("How many recruits would you like to recruit?")
+        self.recruitment_amount = int(input("How many recruits would you like to recruit?"))
         for self.recruitment_amount in range:
             player.party.append("Recruit")
     
@@ -290,10 +312,10 @@ def debug():
         if debug_choice == "1":
             print("")
             player.skill_p = 5
-            print(player.strength)
+            print(player.tactics_skill)
             print(player.max_hp)
             player.skill_point_question()
-            print(player.strength)
+            print(player.tactics_skill)
             print(player.max_hp)
         elif debug_choice == "2":
                     print("")
@@ -341,7 +363,6 @@ def debug():
             print("Was (man_at_arms) now (knight)")
             print("")
             print(knight)
-            
         elif debug_choice == "give dev weapon":
             dev_weapon = Item("dev weapon", 500, 0, 5000)
             player.inventory.append(dev_weapon)
@@ -350,7 +371,7 @@ def debug():
             player.inventory.append(dev_consumable)
         elif debug_choice == "add party":
             player.party.append("Dummy")
-        elif debug_choice == "armour":
+        elif debug_choice == "armours":
             print("""
             Rags: 0
             Gambeson: 15
@@ -358,28 +379,29 @@ def debug():
             Lamellar: 65
             Plate: 80
             """)
-        else:
-            if debugging == "n" or debug_choice == "n":
-                print("Exiting debug mode")
-                print("")
-                print("")
-                print("")
-                print("")
-                print("")
-                print("")
-                print("Welcome to")
-                print("""
-                  ________            ____                              __                   __
-                 /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
-                  / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
-                 / / / / / /  __/  / /_/ / /_/ / / / / / / /  __/ /  / /___/ /_/ / /  / /_/ /  
-                /_/ /_/ /_/\___/  /_____/\__,_/_/ /_/_/ /_/\___/_/  /_____/\____/_/   \__,_/   
-                """)
-                print("""
-                    
+        elif debugging == "n" or debug_choice == "n":
+            print("Exiting debug mode")
+            print("")
+            print("")
+            print("")
+            print("")
+            print("")
+            print("")
+            print("Welcome to")
+            print("""
+                ________            ____                              __                   __
+                /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
+                / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
+                / / / / / /  __/  / /_/ / /_/ / / / / / / /  __/ /  / /___/ /_/ / /  / /_/ /  
+            /_/ /_/ /_/\___/  /_____/\__,_/_/ /_/_/ /_/\___/_/  /_____/\____/_/   \__,_/   
+            """)
+            print("""
+                
 
-                """)
-                break
+            """)
+            break
+        else:
+            pass
 
 print("Welcome to")
 print("""
