@@ -125,14 +125,14 @@ class Soldier:
         self.get_stats()
 
     def __str__(self):
-        print(f"""
-        {self.name}
-        {self.tier}
-        {self.hp}
-        {self.damage}
-        {self.armour}
-        {self.armour_red}
-        {self.mount}
+        return(f"""
+        Name: {self.name}
+        Tier: {self.tier}
+        HP: {self.hp}
+        Damage: {self.damage}
+        Armour type: {self.armour}
+        Armour reduction percentage: {self.armour_red}
+        Mount: {self.mount}
         """)
 
     def get_stats(self):
@@ -404,12 +404,6 @@ veteran = Soldier("Veteran", 4)
 man_at_arms = Soldier("Man-at-Arms", 5)
 knight = Soldier("Knight", 6)
 
-# recruit.get_stats()
-# militia.get_stats()
-# warrior.get_stats()
-# veteran.get_stats()
-# man_at_arms.get_stats()
-# knight.get_stats()
 
 
 debug()
