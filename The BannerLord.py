@@ -24,8 +24,8 @@ def error(code="N/A", function="N/A", fatal=False, message="N/A", unusual=False)
     print("")
     print("")
     # 0: Debug return for testing
-    # 1: Issue with a variable having a string or value not accepted, can be created by bypassing match-case guard of invalid inputs. Most likely a coding error.
-    # 2: Variable value has gone into a range not accepted
+    # 1: Issue with a variable having a string not accepted when expecting one, causing a fail in the function.
+    # 2: Variable value has gone into a range not accepted.
 
 class Player:
 
@@ -99,7 +99,7 @@ class Player:
                 self.max_hp += 5
                 self.hp += 5
             case _:
-                error(fatal=True, message="Code 1\n fix this skill issue (lol)")
+                error(fatal=True, message="Code 2\n fix this skill issue (lol)")
 
     def take_damage(self, damage, attacker):
         final_damage = max(0, round(damage * (1 - self.armour_red / 100)))
@@ -184,11 +184,17 @@ class Soldier:
 
 class Enemy:
 
-    def __init__(self, tier, tactic_skill):
-        pass
+    def __init__(self, name, tier, tactic_skill):
+        self.name = name
+        self.tier = tier
+        self.tactic_skill = tactic_skill
+        self.party_limit = tier * 25
 
     def __str__(self):
-        pass
+        return(f"Name: {self.name}\n"
+              f"Tier: {self.tier}\n"
+              f"Tactics Skill: {self.tactic_skill}\n"
+              f"Party Limit: {self.party_limit}\n")
 
 class Item:
     def __init__(self, name, damage, hp_restore, value):
@@ -293,9 +299,24 @@ class Town:
             player.party.append("Recruit")
     
 
+def map():
+    # Plans to have you travel to other towns with chances of encountering enemies.
+    pass
+
+def battle(defender, attacker):
+    if attacker == player:
+        print(f"You're attacking {defender}.")
+        print(defender)
+    elif defender == player:
+        print(f"{attacker} is attacking you!")
+        print(defender)
+    else:
+        error(fatal=True, message="Code 1, defender and attackers are both NPCs")
+
 def debug():
     debugging = input("Enter debug mode: ")
     debug_town = Town("John's town", True, True, True, True, True, "John Doe", "Kingdom of John", 10)
+    debug_enemy = Enemy("Jane Doe", 10, 2)
     while debugging == "y":
         print("")
         print(f"Debug commands: \n"
@@ -340,7 +361,11 @@ def debug():
         elif debug_choice == "print":
             print(player)
             print("")
-            print("Was (player) now (town)")
+            print("Was (player) now (enemy)")
+            print("")
+            print(debug_enemy)
+            print("")
+            print("Was (enemy) now (town)")
             print("")
             print(debug_town)
             print("")
@@ -393,10 +418,10 @@ def debug():
             print("")
             print("Welcome to")
             print("""
-                ________            ____                              __                   __
-                /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
-                / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
-                / / / / / /  __/  / /_/ / /_/ / / / / / / /  __/ /  / /___/ /_/ / /  / /_/ /  
+              ________            ____                              __                   __
+             /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
+              / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
+             / / / / / /  __/  / /_/ / /_/ / / / / / / /  __/ /  / /___/ /_/ / /  / /_/ /  
             /_/ /_/ /_/\___/  /_____/\__,_/_/ /_/_/ /_/\___/_/  /_____/\____/_/   \__,_/   
             """)
             print("""
@@ -421,7 +446,8 @@ print("""
 """)
 
 # Initializing classes
-player = Player(str(input("What is your name?: ")))
+#player = Player(str(input("What is your name?: ")))
+player = Player("Jelly Doe")
 
 recruit = Soldier("Recruit", 1)
 militia = Soldier("Militia", 2)
