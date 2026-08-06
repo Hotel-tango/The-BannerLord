@@ -34,6 +34,7 @@ class Player:
         self.max_hp = 50
         self.hp = 50
         self.level = 0
+        self.tier = 0
         self.tactics_skill = 0
         self.armour_name = "Rags"
         self.armour_red = 0
@@ -41,15 +42,18 @@ class Player:
         self.skill_p = 0
         self.inventory = []
         self.party = []
+        self.level_up(hidden=True)
 
     def get_tier(self):
         self.tier = self.level // 10 + 1
 
-    def level_up(self):
+    def level_up(self, hidden=False):
         if self.level < 0:
             error(fatal=True, message="Code 2, level is negative")
         if self.skill_p < 0:
             error(unusual=True, message="Code 2, skill points is negative")
+        if not hidden==True:
+            print(f"You leveled up! Your level is now {self.level+1}")
         self.level += 1
         self.max_hp += 5
         self.hp = self.max_hp
@@ -98,7 +102,7 @@ class Player:
                 error(fatal=True, message="Code 1\n fix this skill issue (lol)")
 
     def take_damage(self, damage, attacker):
-        final_damage = round(damage * (1 - self.armour_red / 100))
+        final_damage = max(0, round(damage * (1 - self.armour_red / 100)))
         damage_blocked = damage - final_damage
         self.hp -= final_damage
 
@@ -204,7 +208,7 @@ class Item:
             error(unusual=True, message="Code 2, self.hp_restore is negative, should be 0 or more")
         if self.value < 0:
             # Why tho? Why the hell do you need to pay someone to take something from you? It's legit the other way around.
-            print("bruh")
+            error(unusual=True, message="Value of an item is negative, ignore this if that's intentional")
 
 class Town:
 
@@ -282,10 +286,10 @@ class Town:
             case _:
                 error(fatal=True, message="Code 1")
 
-    def recruit(self, recruitment_amount):
+    def recruit(self):
         print(f"Available recruits: {self.available_recruits}")
         self.recruitment_amount = int(input("How many recruits would you like to recruit?"))
-        for self.recruitment_amount in range:
+        for self.recruitment_amount in range(int(self.available_recruits)):
             player.party.append("Recruit")
     
 
