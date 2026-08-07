@@ -218,7 +218,7 @@ class Item:
 
 class Town:
 
-    def __init__(self, name, armour_shop, weapon_shop, misc_shop, mount_shop, tavern, owner, kingdom, available_recruits):
+    def __init__(self, name="Placeholder", armour_shop=False, weapon_shop=False, misc_shop=False, mount_shop=False, tavern=False, owner="Placeholder", kingdom="Placeholder", available_recruits=0):
         self.name = name
         self.armour_shop = armour_shop
         self.weapon_shop = weapon_shop
@@ -248,6 +248,8 @@ class Town:
         type = str(type).capitalize()
         print(f"You have arrived at the {type}")
         print("Which of the following items would you like to purchase?")
+        # Gonna need a list to pick items from.
+        #print("\n".join())
 
     def options(self):
         while True:
@@ -261,7 +263,7 @@ class Town:
             print("This town has a:" if len(shop_list) == 1 else "This town has:")
             print("\n".join(f"{k}: {v}" for k, v in shop_list.items()))
             print("")
-            choice = input("Which would you like to enter?: ").capitalize()
+            choice = input("Which would you like to enter? (Type 'recruit' to get recruitment options): ").capitalize()
             if choice.isdigit():
                 choice = int(choice)
             else:
@@ -273,8 +275,10 @@ class Town:
             elif choice in shop_list.values():
                 selected_shop = choice
                 break
+            elif choice == "Recruit":
+                self.recruit_town()
             else:
-                print("Invalid input, type a number corresponding to the shop you want to enter, or its name.\n")
+                print("Invalid input, type a number corresponding to the shop you want to enter, or it's name.\n")
 
         match selected_shop:
             case "Armour shop":
@@ -292,11 +296,13 @@ class Town:
             case _:
                 error(fatal=True, message="Code 1")
 
-    def recruit(self):
+    def recruit_town(self):
         print(f"Available recruits: {self.available_recruits}")
-        self.recruitment_amount = int(input("How many recruits would you like to recruit?"))
+        self.recruitment_amount = int(input("How many recruits would you like to recruit?: "))
         for self.recruitment_amount in range(int(self.available_recruits)):
             player.party.append("Recruit")
+        print(player.party)
+        print("")
     
 
 def map():
