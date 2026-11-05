@@ -23,6 +23,7 @@ def error(code="N/A", function="N/A", fatal=False, message="N/A", unusual=False)
 
     print("")
     print("")
+    # Might be revamping to use just general text instead of codes.
     # 0: Debug return for testing
     # 1: Issue with a variable having a string not accepted when expecting one, causing a fail in the function.
     # 2: Variable value has gone into a range not accepted.
@@ -49,9 +50,9 @@ class Player:
 
     def level_up(self, hidden=False):
         if self.level < 0:
-            error(fatal=True, message="Code 2, level is negative")
+            error(fatal=True, message="Expected positive level input, got negative")
         if self.skill_p < 0:
-            error(unusual=True, message="Code 2, skill points is negative")
+            error(unusual=True, message="Expected positive skill points, got negative")
         if not hidden==True:
             print(f"You leveled up! Your level is now {self.level+1}")
         self.level += 1
@@ -99,7 +100,7 @@ class Player:
                 self.max_hp += 5
                 self.hp += 5
             case _:
-                error(fatal=True, message="Code 2\n fix this skill issue (lol)")
+                error(fatal=True, message="Fix this skill issue (lol, but in all seriousness previous guard failed)")
 
     def take_damage(self, damage, attacker):
         final_damage = max(0, round(damage * (1 - self.armour_red / 100)))
@@ -180,7 +181,7 @@ class Soldier:
             self.armour_red = 80
             self.mount = "Horse"
         else:
-            error(fatal=True, message="Code 2, troop tier isn't in accepted range")
+            error(fatal=True, message="Troop tier isn't in accepted range")
 
 class Enemy:
 
@@ -263,7 +264,7 @@ class Town:
             print("This town has a:" if len(shop_list) == 1 else "This town has:")
             print("\n".join(f"{k}: {v}" for k, v in shop_list.items()))
             print("")
-            choice = input("Which would you like to enter? (Type 'recruit' to get recruitment options): ").capitalize()
+            choice = input("Which would you like to enter? (Type 'recruit' to get recruitment options, exit to exit): ").capitalize()
             if choice.isdigit():
                 choice = int(choice)
             else:
@@ -277,6 +278,8 @@ class Town:
                 break
             elif choice == "Recruit":
                 self.recruit_town()
+            elif choice == "Exit":
+                return
             else:
                 print("Invalid input, type a number corresponding to the shop you want to enter, or it's name.\n")
 
@@ -294,7 +297,7 @@ class Town:
             case "Mount shop":
                 self.store("Mount shop", r.randint(1, 5))
             case _:
-                error(fatal=True, message="Code 1")
+                error(fatal=True, message="Expected shop choice, got other instead")
 
     def recruit_town(self):
         print(f"Available recruits: {self.available_recruits}")
@@ -317,7 +320,7 @@ def battle(defender, attacker):
         print(f"{attacker} is attacking you!")
         print(defender)
     else:
-        error(fatal=True, message="Code 1, defender and attackers are both NPCs")
+        error(fatal=True, message="Defender and attackers are both NPCs")
 
 def debug():
     debugging = input("Enter debug mode: ")
@@ -462,6 +465,6 @@ veteran = Soldier("Veteran", 4)
 man_at_arms = Soldier("Man-at-Arms", 5)
 knight = Soldier("Knight", 6)
 
-
-
-debug()
+running = True
+while running == True:
+    debug()
