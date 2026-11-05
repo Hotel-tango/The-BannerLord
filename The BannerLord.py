@@ -309,8 +309,7 @@ class Town:
     
 
 def map():
-    # Plans to have you travel to other towns with chances of encountering enemies.
-    pass
+    print(f"You're currently {current_loc}")
 
 def battle(defender, attacker):
     if attacker == player:
@@ -323,10 +322,9 @@ def battle(defender, attacker):
         error(fatal=True, message="Defender and attackers are both NPCs")
 
 def debug():
-    debugging = input("Enter debug mode: ")
     debug_town = Town("John's town", True, True, True, True, True, "John Doe", "Kingdom of John", 10)
     debug_enemy = Enemy("Jane Doe", 10, 2)
-    while debugging == "y":
+    while debugging == True:
         print("")
         print(f"Debug commands: \n"
               "1: Player skill point test\n"
@@ -417,7 +415,7 @@ def debug():
             Lamellar: 65
             Plate: 80
             """)
-        elif debugging == "n" or debug_choice == "n":
+        elif debugging == False or debug_choice == "n":
             print("Exiting debug mode")
             print("")
             print("")
@@ -455,8 +453,7 @@ print("""
 """)
 
 # Initializing classes
-#player = Player(str(input("What is your name?: ")))
-player = Player("Jelly Doe")
+#player = Player("Jelly Doe")
 
 recruit = Soldier("Recruit", 1)
 militia = Soldier("Militia", 2)
@@ -467,4 +464,10 @@ knight = Soldier("Knight", 6)
 
 running = True
 while running == True:
+    current_loc = "Jane Town"
+    player = Player(str(input("Name your character: ")))
+    if input("Enter debug mode (y/n): ") == "y":
+        debugging = True
+    else:
+        debugging = False
     debug()
