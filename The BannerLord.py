@@ -318,20 +318,22 @@ class Town:
         recruitment_amount = 0
         while loop == True:
             recruitment_amount = input("How many recruits would you like to recruit?: ")
-            if recruitment_amount.isalpha():
-                print("Enter an integer (full number, no decimals)")
-            else:
+            try:
                 recruitment_amount = int(recruitment_amount)
-                if recruitment_amount > self.available_recruits:
-                    print(f"Max number of recruits are {self.available_recruits}")
-                elif recruitment_amount < 0:
-                    print("Type a positive number, or 0")
-                else:
-                    loop = False
-        for x in range(recruitment_amount):
+                #pass
+            except ValueError:
+                    print("Enter an integer (full number, no decimals)")
+                    continue
+            if recruitment_amount > self.available_recruits:
+                print(f"Max number of recruits are {self.available_recruits}")
+            elif recruitment_amount < 0:
+                print("Type a positive number, or 0")
+            else:
+                loop = False
+        for i in range(recruitment_amount):
             player.party.append("Recruit")
             self.available_recruits -= 1
-        print(f"recruited {x+1} recruits")
+        print(f"recruited {recruitment_amount} recruits")
         print("")
     
 
