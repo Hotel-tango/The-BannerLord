@@ -32,9 +32,12 @@ class Player:
 
     def __init__(self, name):
         self.name = name
+        self.alive = True
         self.max_hp = 50
         self.hp = 50
         self.level = 0
+        self.xp = 750
+        self.xp_lvl_up = 750
         self.tier = 0
         self.tactics_skill = 0
         self.armour_name = "Rags"
@@ -59,8 +62,13 @@ class Player:
         self.max_hp += 5
         self.hp = self.max_hp
         self.skill_p += 1
+        self.xp -= self.xp_lvl_up
+        self.xp_lvl_up += 250
         self.get_tier()
-        
+
+    def check_xp(self):
+        while self.xp >= self.xp_lvl_up:
+            self.level_up()
 
     def skill_point_question(self):
         if self.skill_p > 0:
@@ -102,16 +110,21 @@ class Player:
             case _:
                 error(fatal=True, message="Fix this skill issue (lol, but in all seriousness previous guard failed)")
 
-    def take_damage(self, damage, attacker):
-        final_damage = max(0, round(damage * (1 - self.armour_red / 100)))
+    def take_damage(self, damage, attacker, blunt=False):
+        if blunt == False:
+            final_damage = max(0, round(damage * (1 - self.armour_red / 100)))
+        elif blunt == True:
+            # the higher the number to the right (x / y, so y) is, the less effective armour reduction is
+            final_damage = max(0, round(damage * (1 - self.armour_red / 200)))
         damage_blocked = damage - final_damage
         self.hp -= final_damage
 
         if damage < 0:
-            error(unusual=True, message="Code 2, negative damage passed to take_damage")
+            error(fatal=True, message="Expected damage to be positive, got negative")
 
         if self.hp < 1:
             print(f"You died by the hands of {attacker}.")
+            self.alive = False
         else:
             print(f"{attacker} did {final_damage} against you, your armour blocked {damage_blocked}. Your hp is now {self.hp}.")
 
@@ -123,8 +136,8 @@ class Player:
                f"Current HP: {self.hp}\n"
                f"Armour: {self.armour_name}, {self.armour_red}% reduction to damage\n"
                f"Available skill points: {self.skill_p}\n"
-               f"Inventory: {", ".join(str(Item) for Item in self.inventory)}\n"
-               f"Party: {", ".join(self.party)}")
+               f"Inventory: {', '.join(str(Item) for Item in self.inventory)}\n"
+               f"Party: {', '.join(self.party)}")
 
 class Soldier:
     def __init__(self, name, tier):
@@ -302,13 +315,17 @@ class Town:
     def recruit_town(self):
         print(f"Available recruits: {self.available_recruits}")
         self.recruitment_amount = int(input("How many recruits would you like to recruit?: "))
-        for self.recruitment_amount in range(int(self.available_recruits)):
+        if self.recruitment_amount > self.available_recruits:
+            print(f"Max number of recruits are {self.available_recruits}")
+            self.recruitment_amount = int(input("How many recruits would you like to recruit?: "))
+        for x in range(self.recruitment_amount):
             player.party.append("Recruit")
+        self.recruitment_amount = 0
         print(player.party)
         print("")
     
 
-def map():
+def world_map():
     print(f"You're currently {current_loc}")
 
 def battle(defender, attacker):
@@ -327,19 +344,20 @@ def debug():
     while debugging == True:
         print("")
         print(f"Debug commands: \n"
-              "1: Player skill point test\n"
-              "2: Inventory test\n"
-              "3: Error test\n"
-              "4: Crash error test\n"
-              "5: Unusual error test\n"
-              "6: Town test\n"
-              "print: Prints information about: town, player\n"
-              "give dev weapon: Gives an overpowered weapon\n"
-              "give dev consumable: Gives an overpowered consumable\n"
-              "add party: Adds a dummy to the party\n"
-              "armours: Prints all armours and their stats\n"
-              "\n"
-              "To exit debug mode, type n\n")
+            "1: Player skill point test\n"
+            "2: Inventory test\n"
+            "3: Error test\n"
+            "4: Crash error test\n"
+            "5: Unusual error test\n"
+            "6: Town test\n"
+            "print: Prints information about: town, player\n"
+            "give dev weapon: Gives an overpowered weapon\n"
+            "give dev consumable: Gives an overpowered consumable\n"
+            "take damage: Take damage\n"
+            "add party: Adds a dummy to the party\n"
+            "armours: Prints all armours and their stats\n"
+            "\n"
+            "To exit debug mode, type n\n")
         debug_choice = input("Debug choice: ")
         if debug_choice == "1":
             print("")
@@ -353,7 +371,7 @@ def debug():
                     print("")
                     obj = Item("dev object", 5, 5, 5)
                     player.inventory.append(obj)
-                    print(f"Inventory: {", ".join(str(Item) for Item in player.inventory)}\n")
+                    print(f"Inventory: {', '.join(str(item) for item in player.inventory)}\n")
         elif debug_choice == "3":
             print("")
             error(0, "John Debug's place of residence")
@@ -405,6 +423,8 @@ def debug():
         elif debug_choice == "give dev consumable":
             dev_consumable = Item("dev consumable", 0, 500, 500)
             player.inventory.append(dev_consumable)
+        elif debug_choice == "take damage":
+            player.take_damage(int(input("Damage amount > ")), "Jane Doe", bool(input("blunt? (type anything for yes, nothing for no) >")))
         elif debug_choice == "add party":
             player.party.append("Dummy")
         elif debug_choice == "armours":
@@ -424,7 +444,7 @@ def debug():
             print("")
             print("")
             print("Welcome to")
-            print("""
+            print(R"""
               ________            ____                              __                   __
              /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
               / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
@@ -440,7 +460,7 @@ def debug():
             pass
 
 print("Welcome to")
-print("""
+print(R"""
   ________            ____                              __                   __
  /_  __/ /_  ___     / __ )____ _____  ____  ___  _____/ /   ____  _________/ /
   / / / __ \/ _ \   / __  / __ `/ __ \/ __ \/ _ \/ ___/ /   / __ \/ ___/ __  / 
